@@ -15,6 +15,7 @@ RUN echo "======[Base Requerimients Install]======" && \
  	php7.2-curl \
 	php7.2-xml \
 	php7.2-zip \
+	php7.2-mbstring \
 	git \
 	nano \
 	npm \
@@ -44,10 +45,10 @@ RUN echo "======[Install Composer & Tools]======" && \
 	composer global require escapestudios/symfony2-coding-standard && \
 	composer global require phpunit/phpunit
 
-RUN RUN echo "======[Install NPM Tools]======" && \
-	npm install -g prettier && \
-	npm install -g @prettier/plugin-php
-	
+RUN echo "======[Install NPM Tools]======" && \
+ 	npm install -g prettier && \
+ 	npm install -g @prettier/plugin-php
+
 # CleanUp
 RUN  rm -rf tmp/* /var/lib/apt/lists/* /var/tmp/*
 
