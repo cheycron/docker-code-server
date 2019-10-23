@@ -11,7 +11,7 @@ if [ -n "${SUDO_PASSWORD}" ]; then
   echo "setting sudo password"
   echo -e "${SUDO_PASSWORD}\n${SUDO_PASSWORD}" | passwd abc
 fi
-
+chsh --shell /bin/bash abc
 # permissions
 chown -R abc:abc \
 	/config

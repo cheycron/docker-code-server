@@ -1,16 +1,14 @@
 FROM lsiobase/ubuntu:bionic
-
 # set version label
 ARG BUILD_DATE
 ARG VERSION
 ARG CODE_RELEASE
-LABEL build_version="Linuxserver.io version:- ${VERSION} Build-date:- ${BUILD_DATE}"
-LABEL maintainer="aptalca"
-
+LABEL build_version="Version:- ${VERSION} Build-date:- ${BUILD_DATE}"
+LABEL maintainer="Cheycron"
 # environment settings
 ENV HOME="/config"
 
-RUN \
+RUN echo "======[Base Requerimients Install]======" && \
  apt-get update && \
  apt-get install -y \
  	php7.2-cli \
@@ -19,9 +17,11 @@ RUN \
 	php7.2-zip \
 	git \
 	nano \
+	npm \
 	net-tools \
-	sudo && \
- echo "**** install code-server ****" && \
+	sudo
+
+RUN echo "======[Install code-server]======" && \
  if [ -z ${CODE_RELEASE+x} ]; then \
 	CODE_RELEASE=$(curl -sX GET "https://api.github.com/repos/cdr/code-server/releases/latest" \
 	| awk '/tag_name/{print $4;exit}' FS='[""]'); \
@@ -33,15 +33,23 @@ RUN \
 	/usr/bin/ --strip-components=1 \
   --wildcards code-server*/code-server
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Install composer && tools
+RUN echo "======[Install Composer & Tools]======" && \
+	curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+	composer global require "squizlabs/php_codesniffer=*" && \
+ 	composer global require friendsofphp/php-cs-fixer && \
+ 	composer global require phpmd/phpmd && \
+	composer global require phpstan/phpstan && \
+	composer global require deployer/deployer && \
+	composer global require escapestudios/symfony2-coding-standard && \
+	composer global require phpunit/phpunit
 
+RUN RUN echo "======[Install NPM Tools]======" && \
+	npm install -g prettier && \
+	npm install -g @prettier/plugin-php
+	
 # CleanUp
 RUN  rm -rf tmp/* /var/lib/apt/lists/* /var/tmp/*
-
-RUN composer global require "squizlabs/php_codesniffer=*" && \
- 	composer global require friendsofphp/php-cs-fixer && \
- 	composer global require phpmd/phpmd
 
 # add local files
 COPY /root /
